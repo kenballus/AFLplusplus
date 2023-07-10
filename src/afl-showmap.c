@@ -699,6 +699,15 @@ static void showmap_run_target(afl_forkserver_t *fsrv, char **argv) {
 
 }
 
+/* Handle the signal to dump the coverage table */
+
+static void handle_dump_table_sig(int sig) {
+
+  (void)sig;
+  write_results_to_file(fsrv, out_file);
+
+}
+
 /* Handle Ctrl-C and the like. */
 
 static void handle_stop_sig(int sig) {
@@ -787,6 +796,7 @@ static void setup_signal_handlers(void) {
   sigaction(SIGHUP, &sa, NULL);
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
+  signal(SIGUSR1, handle_dump_table_sig);
 
 }
 
