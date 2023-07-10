@@ -796,6 +796,9 @@ static void setup_signal_handlers(void) {
   sigaction(SIGHUP, &sa, NULL);
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
+
+  /* The dump tables signal. */
+
   signal(SIGUSR1, handle_dump_table_sig);
 
 }
