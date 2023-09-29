@@ -2,8 +2,10 @@
 
 ## Should
 
+ - afl-showmap -f support
+ - afl-fuzz multicore wrapper script
+ - add value_profile but only enable after 15 minutes without finds
  - afl-crash-analysis
- - test cmplog for less than 16bit
  - support persistent and deferred fork server in afl-showmap?
  - better autodetection of shifting runtime timeout values
  - Update afl->pending_not_fuzzed for MOpt

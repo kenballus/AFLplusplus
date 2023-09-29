@@ -5,9 +5,9 @@
    Originally written by Michal Zalewski
 
    Now maintained by Marc Heuse <mh@mh-sec.de>,
-                     Heiko Eißfeldt <heiko.eissfeldt@hexco.de>,
-                     Andrea Fioraldi <andreafioraldi@gmail.com>,
                      Dominik Maier <mail@dmnk.co>
+                     Andrea Fioraldi <andreafioraldi@gmail.com>,
+                     Heiko Eissfeldt <heiko.eissfeldt@hexco.de>,
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
    Copyright 2019-2023 AFLplusplus Project. All rights reserved.
@@ -26,7 +26,7 @@
 /* Version string: */
 
 // c = release, a = volatile github dev, e = experimental branch
-#define VERSION "++4.08a"
+#define VERSION "++4.09a"
 
 /******************************************************
  *                                                    *
@@ -60,10 +60,6 @@
  *
  */
 
-/* if TRANSFORM is enabled with '-l T', this additionally enables base64
-   encoding/decoding */
-// #define CMPLOG_SOLVE_TRANSFORM_BASE64
-
 /* If a redqueen pass finds more than one solution, try to combine them? */
 #define CMPLOG_COMBINE
 
@@ -71,10 +67,10 @@
 #define CMPLOG_CORPUS_PERCENT 5U
 
 /* Number of potential positions from which we decide if cmplog becomes
-   useless, default 8096 */
+   useless, default 12288 */
 #define CMPLOG_POSITIONS_MAX (12 * 1024)
 
-/* Maximum allowed fails per CMP value. Default: 128 */
+/* Maximum allowed fails per CMP value. Default: 96 */
 #define CMPLOG_FAIL_MAX 96
 
 /* -------------------------------------*/
@@ -124,9 +120,9 @@
 
 // #define _WANT_ORIGINAL_AFL_ALLOC
 
-/* Comment out to disable fancy ANSI boxes and use poor man's 7-bit UI: */
+/* Comment out to disable fancy boxes and use poor man's 7-bit UI: */
 
-#ifndef ANDROID_DISABLE_FANCY  // Fancy boxes are ugly from adb
+#ifndef DISABLE_FANCY
   #define FANCY_BOXES
 #endif
 
