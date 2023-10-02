@@ -275,7 +275,7 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
     if (strcmp(outfile, "-")) {
 
       // create empty file to prevent error messages in afl-cmin
-      fd = open(outfile, O_WRONLY | O_CREAT, DEFAULT_PERMISSION | S_IROTH);
+      fd = open(outfile, O_WRONLY | O_CREAT | O_EXCL, DEFAULT_PERMISSION);
       close(fd);
 
     }
@@ -298,7 +298,7 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
   } else {
 
     unlink(outfile);                                       /* Ignore errors */
-    fd = open(outfile, O_WRONLY | O_CREAT | O_EXCL, DEFAULT_PERMISSION);
+    fd = open(outfile, O_WRONLY | O_CREAT, DEFAULT_PERMISSION | S_IROTH);
     if (fd < 0) { PFATAL("Unable to create '%s'", outfile); }
 
   }
