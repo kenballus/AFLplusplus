@@ -712,6 +712,14 @@ static void handle_dump_table_sig(int sig) {
 
 }
 
+static void handle_clear_table_sig(int sig) {
+
+  (void)sig;
+  memset(fsrv->trace_bits, '\0', fsrv->map_size);
+
+}
+
+
 /* Handle Ctrl-C and the like. */
 
 static void handle_stop_sig(int sig) {
@@ -804,6 +812,7 @@ static void setup_signal_handlers(void) {
   /* The dump tables signal. */
 
   signal(SIGUSR1, handle_dump_table_sig);
+  signal(SIGUSR2, handle_clear_table_sig);
 
 }
 
