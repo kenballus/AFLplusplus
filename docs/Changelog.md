@@ -10,6 +10,12 @@
     - added AFL_IGNORE_SEED_PROBLEMS to skip over seeds that time out instead
       of exiting with an error message
     - allow -S/-M naming up to 50 characters (from 24)
+    - CMPLOG:
+      - added scale support (-l S)
+      - skip unhelpful insertions (u8)
+    - added --version and --help command line parameters
+    - fixed endless loop when reading malformed dictionaries
+    - new custom mutator function: post_run - thanks to yangzao!
   - afl-whatsup:
     - detect instanced that are starting up and show them as such as not dead
     - now also shows coverage reached
@@ -19,7 +25,9 @@
     - fix for a few string compare transform functions for LAF
   - frida_mode:
     - fixes support for large map offsets
-  - added benchmark/benchmark.sh if you want to see how good your fuzzing
+  - afl-cmin/afl-cmin.bash: prevent unneeded file errors
+  - added new tool afl-addseeds that adds new seeds to a running campaign
+  - added benchmark/benchmark.py if you want to see how good your fuzzing
     speed is in comparison to other setups.
 
 

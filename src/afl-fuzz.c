@@ -486,6 +486,22 @@ int main(int argc, char **argv_orig, char **envp) {
   struct timeval  tv;
   struct timezone tz;
 
+  doc_path = access(DOC_PATH, F_OK) != 0 ? (u8 *)"docs" : (u8 *)DOC_PATH;
+
+  if (argc > 1 && strcmp(argv_orig[1], "--version") == 0) {
+
+    printf("afl-fuzz" VERSION "\n");
+    exit(0);
+
+  }
+
+  if (argc > 1 && strcmp(argv_orig[1], "--help") == 0) {
+
+    usage(argv_orig[0], 1);
+    exit(0);
+
+  }
+
   #if defined USE_COLOR && defined ALWAYS_COLORED
   if (getenv("AFL_NO_COLOR") || getenv("AFL_NO_COLOUR")) {
 
@@ -514,8 +530,6 @@ int main(int argc, char **argv_orig, char **envp) {
 
   SAYF(cCYA "afl-fuzz" VERSION cRST
             " based on afl by Michal Zalewski and a large online community\n");
-
-  doc_path = access(DOC_PATH, F_OK) != 0 ? (u8 *)"docs" : (u8 *)DOC_PATH;
 
   gettimeofday(&tv, &tz);
   rand_set_seed(afl, tv.tv_sec ^ tv.tv_usec ^ getpid());
@@ -1152,6 +1166,10 @@ int main(int argc, char **argv_orig, char **envp) {
             case 'A':
               afl->cmplog_enable_arith = 1;
               break;
+            case 's':
+            case 'S':
+              afl->cmplog_enable_scale = 1;
+              break;
             case 't':
             case 'T':
               afl->cmplog_enable_transform = 1;
@@ -1343,6 +1361,12 @@ int main(int argc, char **argv_orig, char **envp) {
         if (!show_help) { show_help = 1; }
 
     }
+
+  }
+
+  if (afl->sync_id && strcmp(afl->sync_id, "addseeds") == 0) {
+
+    FATAL("-M/-S name 'addseeds' is a reserved name, choose something else");
 
   }
 
@@ -2826,7 +2850,9 @@ int main(int argc, char **argv_orig, char **envp) {
 
     if (likely(afl->switch_fuzz_mode && afl->fuzz_mode == 0 &&
                !afl->non_instrumented_mode) &&
-        unlikely(cur_time > afl->last_find_time + afl->switch_fuzz_mode)) {
+        unlikely(cur_time > (likely(afl->last_find_time) ? afl->last_find_time
+                                                         : afl->start_time) +
+                                afl->switch_fuzz_mode)) {
 
       if (afl->afl_env.afl_no_ui) {
 
