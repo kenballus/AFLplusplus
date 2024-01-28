@@ -705,23 +705,22 @@ static void showmap_run_target(afl_forkserver_t *fsrv, char **argv) {
 
 /* Handle the signal to dump the coverage table */
 
-uint8_t clear_count = 0;
-
 static void handle_dump_table_sig(int sig) {
   (void)sig;
-  int fd = open("/tmp/clear_count", O_CREAT | O_WRONLY | O_TRUNC, S_IWUSR | S_IROTH);
-  if (fd < 0) { PFATAL("Unable to open clear_count!"); }
-  if (write(fd, &clear_count, sizeof(clear_count)) < (ssize_t)sizeof(clear_count)) {
-    PFATAL("Unable to write clear_count! (errno=%d)", errno);
+  static uint8_t dump_count = 0;
+  int fd = open("/tmp/dump_count", O_CREAT | O_WRONLY | O_TRUNC, S_IWUSR | S_IROTH);
+  if (fd < 0) { PFATAL("Unable to open dump_count!"); }
+  if (write(fd, &dump_count, sizeof(dump_count)) < (ssize_t)sizeof(dump_count)) {
+    PFATAL("Unable to write dump_count! (errno=%d)", errno);
   }
-  if (close(fd) < 0) { PFATAL("Unable to close clear_count!"); }
+  if (close(fd) < 0) { PFATAL("Unable to close dump_count!"); }
+  dump_count++;
   write_results_to_file(fsrv, out_file);
 }
 
 static void handle_clear_table_sig(int sig) {
   (void)sig;
   memset(fsrv->trace_bits, '\0', fsrv->map_size);
-  clear_count++;
 }
 
 
