@@ -709,9 +709,11 @@ uint8_t clear_count = 0;
 
 static void handle_dump_table_sig(int sig) {
   (void)sig;
-  int fd = open("/tmp/clear_count", O_CREAT, DEFAULT_PERMISSION | S_IROTH);
+  int fd = open("/tmp/clear_count", O_CREAT | O_WRONLY | O_TRUNC, S_IWUSR | S_IROTH);
   if (fd < 0) { PFATAL("Unable to open clear_count!"); }
-  write(fd, &clear_count, sizeof(clear_count));
+  if (write(fd, &clear_count, sizeof(clear_count)) < (ssize_t)sizeof(clear_count)) {
+    PFATAL("Unable to write clear_count! (errno=%d)", errno);
+  }
   if (close(fd) < 0) { PFATAL("Unable to close clear_count!"); }
   write_results_to_file(fsrv, out_file);
 }
@@ -812,19 +814,8 @@ static void setup_signal_handlers(void) {
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
 
-  struct sigaction dump_table_sa;
-  sigemptyset(&sa.sa_mask);
-  dump_table_sa.sa_flags = 0;
-  dump_table_sa.sa_sigaction = NULL;
-  dump_table_sa.sa_handler = handle_dump_table_sig;
-  sigaction(SIGUSR1, &dump_table_sa, NULL);
-
-  struct sigaction clear_table_sa;
-  sigemptyset(&sa.sa_mask);
-  clear_table_sa.sa_flags = 0;
-  clear_table_sa.sa_sigaction = NULL;
-  clear_table_sa.sa_handler = handle_clear_table_sig;
-  sigaction(SIGUSR2, &clear_table_sa, NULL);
+  signal(SIGUSR1, handle_dump_table_sig);
+  signal(SIGUSR2, handle_clear_table_sig);
 }
 
 u32 execute_testcases(u8 *dir) {
