@@ -705,18 +705,21 @@ static void showmap_run_target(afl_forkserver_t *fsrv, char **argv) {
 
 /* Handle the signal to dump the coverage table */
 
+uint8_t clear_count = 0;
+
 static void handle_dump_table_sig(int sig) {
-
   (void)sig;
+  int fd = open("/tmp/clear_count", O_CREAT, DEFAULT_PERMISSION | S_IROTH);
+  if (fd < 0) { PFATAL("Unable to open clear_count!"); }
+  write(fd, &clear_count, sizeof(clear_count));
+  if (close(fd) < 0) { PFATAL("Unable to close clear_count!"); }
   write_results_to_file(fsrv, out_file);
-
 }
 
 static void handle_clear_table_sig(int sig) {
-
   (void)sig;
   memset(fsrv->trace_bits, '\0', fsrv->map_size);
-
+  clear_count++;
 }
 
 
@@ -809,11 +812,19 @@ static void setup_signal_handlers(void) {
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
 
-  /* The dump tables signal. */
+  struct sigaction dump_table_sa;
+  sigemptyset(&sa.sa_mask);
+  dump_table_sa.sa_flags = 0;
+  dump_table_sa.sa_sigaction = NULL;
+  dump_table_sa.sa_handler = handle_dump_table_sig;
+  sigaction(SIGUSR1, &dump_table_sa, NULL);
 
-  signal(SIGUSR1, handle_dump_table_sig);
-  signal(SIGUSR2, handle_clear_table_sig);
-
+  struct sigaction clear_table_sa;
+  sigemptyset(&sa.sa_mask);
+  clear_table_sa.sa_flags = 0;
+  clear_table_sa.sa_sigaction = NULL;
+  clear_table_sa.sa_handler = handle_clear_table_sig;
+  sigaction(SIGUSR2, &clear_table_sa, NULL);
 }
 
 u32 execute_testcases(u8 *dir) {
