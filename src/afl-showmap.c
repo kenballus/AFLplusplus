@@ -252,6 +252,23 @@ static void analyze_results(afl_forkserver_t *fsrv) {
 
 }
 
+static size_t itoa(unsigned long long value, char *str) {
+    if (value == 0) {
+        str[0] = '0';
+        str[1] = '\0';
+        return 1;
+    }
+
+    size_t ret = 0;
+    while (value > 0) {
+        str[ret] = '0' + (value % 10);
+        value /= 10;
+        ret++;
+    }
+    str[ret] = '\0';
+    return ret;
+}
+
 /* Write results. */
 
 static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
@@ -314,11 +331,6 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
     close(fd);
 
   } else {
-
-    FILE *f = fdopen(fd, "w");
-
-    if (!f) { PFATAL("fdopen() failed"); }
-
     for (i = 0; i < map_size; i++) {
 
       if (!fsrv->trace_bits[i]) { continue; }
@@ -327,19 +339,20 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
       total += fsrv->trace_bits[i];
       if (highest < fsrv->trace_bits[i]) { highest = fsrv->trace_bits[i]; }
 
-      if (cmin_mode) {
+      // 20 digits max for a 64-bit integer, +1 for colon, +1 for newline, +1 for nul
+      char num_buf[43] = {};
+      size_t len = itoa(i, num_buf);
 
-        fprintf(f, "%u%03u\n", i, fsrv->trace_bits[i]);
+      num_buf[len] = ':';
+      len++;
 
-      } else {
+      len += itoa(fsrv->trace_bits[i], num_buf + len);
 
-        fprintf(f, "%06u:%u\n", i, fsrv->trace_bits[i]);
+      num_buf[len] = '\n';
+      len++;
 
-      }
-
+      write(fd, num_buf, len);
     }
-
-    fclose(f);
 
   }
 
@@ -804,31 +817,8 @@ static void setup_signal_handlers(void) {
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
 
-  struct sigaction dump_sa;
-  dump_sa.sa_handler = NULL;
-#ifdef SA_RESTART
-  dump_sa.sa_flags = SA_RESTART;
-#else
-  dump_sa.sa_flags = 0;
-#endif
-  dump_sa.sa_sigaction = NULL;
-
-  dump_sa.sa_handler = handle_dump_table_sig;
-  sigemptyset(&dump_sa.sa_mask);
-  sigaction(SIGUSR1, &dump_sa, NULL);
-
-  struct sigaction clear_sa;
-  clear_sa.sa_handler = NULL;
-#ifdef SA_RESTART
-  clear_sa.sa_flags = SA_RESTART;
-#else
-  clear_sa.sa_flags = 0;
-#endif
-  clear_sa.sa_sigaction = NULL;
-
-  clear_sa.sa_handler = handle_clear_table_sig;
-  sigemptyset(&clear_sa.sa_mask);
-  sigaction(SIGUSR2, &clear_sa, NULL);
+  signal(SIGUSR1, handle_dump_table_sig);
+  signal(SIGUSR2, handle_clear_table_sig);
 }
 
 u32 execute_testcases(u8 *dir) {
