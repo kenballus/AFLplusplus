@@ -804,8 +804,31 @@ static void setup_signal_handlers(void) {
   sigaction(SIGINT, &sa, NULL);
   sigaction(SIGTERM, &sa, NULL);
 
-  signal(SIGUSR1, handle_dump_table_sig);
-  signal(SIGUSR2, handle_clear_table_sig);
+  struct sigaction dump_sa;
+  dump_sa.sa_handler = NULL;
+#ifdef SA_RESTART
+  dump_sa.sa_flags = SA_RESTART;
+#else
+  dump_sa.sa_flags = 0;
+#endif
+  dump_sa.sa_sigaction = NULL;
+
+  dump_sa.sa_handler = handle_dump_table_sig;
+  sigemptyset(&dump_sa.sa_mask);
+  sigaction(SIGUSR1, &dump_sa, NULL);
+
+  struct sigaction clear_sa;
+  clear_sa.sa_handler = NULL;
+#ifdef SA_RESTART
+  clear_sa.sa_flags = SA_RESTART;
+#else
+  clear_sa.sa_flags = 0;
+#endif
+  clear_sa.sa_sigaction = NULL;
+
+  clear_sa.sa_handler = handle_clear_table_sig;
+  sigemptyset(&clear_sa.sa_mask);
+  sigaction(SIGUSR2, &clear_sa, NULL);
 }
 
 u32 execute_testcases(u8 *dir) {
