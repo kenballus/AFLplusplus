@@ -632,7 +632,7 @@ crash or timeout during startup.
 
 Also, it is recommended to set `export AFL_IMPORT_FIRST=1` to load test cases
 from other fuzzers in the campaign first. But note that can slow down the start
-of the first fuzz by quite a lot of you have many fuzzers and/or many seeds.
+of the first fuzz by quite a lot if you have many fuzzers and/or many seeds.
 
 If you have a large corpus, a corpus from a previous run or are fuzzing in a CI,
 then also set `export AFL_CMPLOG_ONLY_NEW=1` and `export AFL_FAST_CAL=1`.
@@ -958,7 +958,7 @@ too long for your overall available fuzz run time.
    campaign but not good for short CI runs.
 
 How this can look like can, e.g., be seen at AFL++'s setup in Google's
-[oss-fuzz](https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-builder/compile_afl)
+[previous oss-fuzz version](https://github.com/google/oss-fuzz/blob/3e2c5312417d1a6f9564472f3df1fd27759b289d/infra/base-images/base-builder/compile_afl)
 and
 [clusterfuzz](https://github.com/google/clusterfuzz/blob/master/src/clusterfuzz/_internal/bot/fuzzers/afl/launcher.py).
 
