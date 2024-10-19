@@ -706,14 +706,6 @@ static void showmap_run_target(afl_forkserver_t *fsrv, char **argv) {
 
 static void handle_dump_table_sig(int sig) {
   (void)sig;
-  static uint8_t dump_count = 0;
-  int fd = open("/tmp/dump_count", O_CREAT | O_WRONLY | O_TRUNC, S_IWUSR | S_IROTH);
-  if (fd < 0) { PFATAL("Unable to open dump_count!"); }
-  if (write(fd, &dump_count, sizeof(dump_count)) < (ssize_t)sizeof(dump_count)) {
-    PFATAL("Unable to write dump_count! (errno=%d)", errno);
-  }
-  if (close(fd) < 0) { PFATAL("Unable to close dump_count!"); }
-  dump_count++;
   write_results_to_file(fsrv, out_file);
 }
 
