@@ -170,7 +170,7 @@ static void at_exit() {
 
   if (pid2 > 0) {
 
-    pgrp = getpgid(pid1);
+    pgrp = getpgid(pid2);
     if (pgrp > 0) { killpg(pgrp, kill_signal); }
     kill(pid2, kill_signal);
 
@@ -3430,7 +3430,7 @@ stop_fuzzing:
 
       ZLIBCLOSE(fr_fd);
       afl->var_byte_count = count_bytes(afl, afl->var_bytes);
-      OKF("Written fastresume.bin with %u bytes!", w);
+      OKF("fastresume.bin succesfully written with %u bytes.", w);
 
     } else {
 
