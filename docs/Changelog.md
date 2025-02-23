@@ -3,10 +3,15 @@
   This is the list of all noteworthy changes made in every public
   release of the tool. See README.md for the general instruction manual.
 
+### Version ++4.32a (dev)
+  - ...
 
-### Version ++4.31a (dev)
+
+### Version ++4.31c (release)
+  - SAND mode added (docs/SAND.md) for more effecient fuzzing with sanitizers
+    (thanks to @wtdcode !)
   - afl-fuzz:
-    - splicing is now DISABLED by default because research showed
+    - splicing phase is now DISABLED by default because research showed
       it is counterproductive. New command line parameter `-u` to enable
       it. Splicing is auto-enabled if two cycles without finds happen.
     - Python 3.13+ support
@@ -19,7 +24,6 @@
       weird setups)
     - fix bug with large map sizes when multiple libraries are loaded after
       the shared memory was obtained.
-
 
 ### Version ++4.30c (release)
   ! afl-gcc and afl-clang funcionality is now removed !
