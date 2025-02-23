@@ -356,6 +356,7 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
     }
 
     close(fd);
+
   }
 
   return ret;
