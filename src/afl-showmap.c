@@ -354,6 +354,7 @@ static u32 write_results_to_file(afl_forkserver_t *fsrv, u8 *outfile) {
 
       write(fd, num_buf, len);
     }
+    close(fd);
 
   }
 
@@ -572,17 +573,13 @@ static void showmap_run_target(afl_forkserver_t *fsrv, char **argv) {
   static struct itimerval it;
   int                     status = 0;
 
+  if (!quiet_mode) { SAYF("-- Program output begins --\n" cRST); }
+
   MEM_BARRIER();
 
   fsrv->child_pid = fork();
 
   if (fsrv->child_pid < 0) { PFATAL("fork() failed"); }
-
-  if (fsrv->child_pid) {
-    OKF("child pid: %d\n", fsrv->child_pid);
-  }
-
-  if (!quiet_mode) { SAYF("-- Program output begins --\n" cRST); }
 
   if (!fsrv->child_pid) {
 
